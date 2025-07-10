@@ -48,11 +48,11 @@ DOWNLOAD_URL="${REPO}/releases/download/${LATEST_RELEASE_VER}/one-line-install-$
 
 TMPDIR="$(mktemp -d)"
 trap cleanup EXIT
+cd "$TMPDIR"
 
 echo "Downloading $DOWNLOAD_URL"
-curl "$DOWNLOAD_URL" -o "${TMPDIR}/archive.tar.gz"
+curl -L -o "archive.tar.gz" "$DOWNLOAD_URL"
 
-cd "$TMPDIR"
 tar xf "archive.tar.gz"
 
 sh ./install.sh
