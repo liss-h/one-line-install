@@ -1,0 +1,32 @@
+name: Test
+on: push
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - os: ubuntu-24.04
+          - os: ubuntu-24.04-arm
+          - os: macos-15
+    runs-on: ${{ matrix.config.os }}
+    steps:
+      - name: Test
+        run: |
+          curl --proto https --tlsv1.2 -sSf https://raw.githubusercontent.com/liss-h/one-line-install/refs/heads/main/install.sh | sh | tee log.txt
+      
+      - name: Check output
+        if: ${{ matrix.config.os == 'ubuntu-24.04' }}
+        run: |
+          cat log.txt | grep "x86_64-linux"
+
+      - name: Check output
+        if: ${{ matrix.config.os == 'ubuntu-24.04-arm' }}
+        run: |
+          cat log.txt | grep "aarch64-linux"
+
+      - name: Check output
+        if: ${{ matrix.config.os == 'macos15' }}
+        run: |
+          cat log.txt | grep "aarch64-darwin"
