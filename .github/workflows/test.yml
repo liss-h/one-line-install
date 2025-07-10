@@ -27,6 +27,6 @@ jobs:
           cat log.txt | grep "aarch64-linux"
 
       - name: Check output
-        if: ${{ matrix.config.os == 'macos15' }}
+        if: ${{ matrix.config.os == 'macos-15' }}
         run: |
           cat log.txt | grep "aarch64-darwin"
