@@ -1,0 +1,58 @@
+#!/bin/sh
+
+set -euo pipefail
+
+TMPDIR=""
+
+fuzzy_eq() {
+    local input="$1"
+    local pattern="$2"
+
+    echo "${input}" | grep -i "${pattern}" > /dev/null
+    return "$?"
+}
+
+cleanup() {
+    if [ -n "$TMPDIR" ]; then
+        rm -rf "$TMPDIR"
+    fi
+}
+
+
+ARCH="$(uname -m)"
+if fuzzy_eq "${ARCH}" "arm64" || fuzzy_eq "${ARCH}" "aarch64"; then
+    ARCH="aarch64"
+elif fuzzy_eq "${ARCH}" "x86_64" || fuzzy_eq "${ARCH}" "x86-64"; then
+    ARCH="x86_64"
+else
+    echo "Unknown architecture"
+    exit 1
+fi
+
+OS="$(uname -o)"
+if fuzzy_eq "${OS}" "linux"; then
+    OS="linux"
+elif fuzzy_eq "${OS}" "darwin"; then
+    OS="darwin"
+else
+    echo "Unknown operating system"
+    exit 1
+fi
+
+
+REPO="https://github.com/liss-h/one-line-install"
+LATEST_RELEASE_PAGE="$(curl -Ls -o /dev/null -w "%{url_effective}" "${REPO}/releases/latest")"
+LATEST_RELEASE_VER="${LATEST_RELEASE_PAGE##*/}"
+
+DOWNLOAD_URL="${REPO}/releases/download/${LATEST_RELEASE_VER}/one-line-install-${LATEST_RELEASE_VER}-${ARCH}-${OS}.tar.gz"
+
+TMPDIR="$(mktemp -d)"
+trap cleanup EXIT
+
+echo "Downloading $DOWNLOAD_URL"
+curl "$DOWNLOAD_URL" -o "${TMPDIR}/archive.tar.gz"
+
+cd "$TMPDIR"
+tar xf "archive.tar.gz"
+
+sh ./install.sh
