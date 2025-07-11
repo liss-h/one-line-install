@@ -41,7 +41,7 @@ fi
 
 
 REPO="https://github.com/liss-h/one-line-install"
-LATEST_RELEASE_PAGE="$(curl -Ls -o /dev/null -w "%{url_effective}" "${REPO}/releases/latest")"
+LATEST_RELEASE_PAGE="$(curl --proto https --tlsv1.2 -Ls -o /dev/null -w "%{url_effective}" "${REPO}/releases/latest")"
 LATEST_RELEASE_VER="${LATEST_RELEASE_PAGE##*/}"
 
 DOWNLOAD_URL="${REPO}/releases/download/${LATEST_RELEASE_VER}/one-line-install-${LATEST_RELEASE_VER}-${ARCH}-${OS}.tar.gz"
@@ -51,7 +51,7 @@ trap cleanup EXIT
 cd "${TMPDIR}"
 
 echo "Downloading ${DOWNLOAD_URL}"
-curl -L -o "archive.tar.gz" "${DOWNLOAD_URL}"
+curl --proto https --tlsv1.2 -L -o "archive.tar.gz" "${DOWNLOAD_URL}"
 
 tar xf "archive.tar.gz"
 
